@@ -7,9 +7,9 @@
 // @name:pl         Przycisk "Pokaż obraz" w wyszukiwarce obrazów Google
 // @name:ja         Google検索「画像を表示」ボタン
 // @name:nl         Google zoeken "Afbeelding bekijken" knop
-// @namespace       https://github.com/devunt/make-gis-great-again
-// @icon            https://raw.githubusercontent.com/devunt/make-gis-great-again/master/icons/icon.png
-// @version         1.4
+// @namespace       https://github.com/HelloWorld017/make-gis-great-again
+// @icon            https://raw.githubusercontent.com/HelloWorld017/make-gis-great-again/master/icons/icon.png
+// @version         1.5
 // @description     This userscript adds "View Image" button to Google Image Search results.
 // @description:ru  Этот скрипт добавляет кнопку "Показать в полном размере" к результатам Google Image Search.
 // @description:sl  Ponovno prikaže gumb "Ogled slike" na Google Slikah.
@@ -18,32 +18,11 @@
 // @description:pl  Ten skrypt przywraca przycisk "Pokaż obraz" do wyszukiwarki obrazów Google
 // @description:ja  このUserScriptはGoogle検索結果に「画像を表示」ボタンを追加します。
 // @description:nl  Voegt de "Afbeelding bekijken" knop aan toe aan Google Afbeeldingen.
-// @author          Bae Junehyeon
+// @author          Bae Junehyeon, Khinenw
 // @run-at          document-end
 // @include         http*://*.google.tld/search*tbm=isch*
+// @include         http*://*.google.co.kr/search*tbm=isch*
 // ==/UserScript==
-
-const lang = {
-  en: 'View image',
-  ru: 'Показать в полном размере',
-  'zh-CN': '查看原图',
-  ja: '画像を表示',
-  he: 'הצג תמונה',
-  fr: 'Voir l\'image',
-  sl: 'Ogled slike',
-  ar: 'عرض الصورة',
-  de: 'Bild ansehen',
-  tr: 'Resmi görüntüle',
-  pt: 'Ver imagem',
-  lt: 'Rodyti vaizdą',
-  pl: 'Pokaż obraz',
-  nl: 'Afbeelding bekijken',
-  se: 'Visa bild',
-  uk: 'Показати зображення',
-  it: 'Apri immagine'
-};
-
-const localizedViewImage = lang[(lang[navigator.language] ? navigator.language : 'en')];
 
 function addButton(node) {
   if (node.nodeType === Node.ELEMENT_NODE) {
@@ -58,27 +37,24 @@ function addButton(node) {
       let thumbnail = node.querySelector('.irc_rimask.irc_rist');
       let src = unescape(thumbnail.querySelector('.rg_l').href.match(/imgurl=([^&]+)/)[1]);
 
-      let buttons = container.querySelector('.irc_but_r tr');
+      let buttons = container.querySelector('.irc_ab');
 
-      let button = buttons.querySelector('td.mgisga');
+      let button = buttons.querySelector('a.mgisga');
       if (button === null) {
-        let openButton = buttons.querySelector('td');
+        let openButton = buttons.querySelector('a.irc-flact');
 
         button = openButton.cloneNode(true);
         button.classList.add('mgisga');
-        button.querySelector('a span:nth-child(2)').innerText = localizedViewImage;
+        button.querySelector('span').innerText = '◆';
 
-        let link = button.querySelector('a');
-        link.href = src;
-        link.className = '';
-        link.removeAttribute('data-cthref');
-        link.removeAttribute('jsaction');
+        button.href = src;
+		button.target = '_blank';
+		button.rel = 'noopener';
+        button.removeAttribute('data-ved');
+		button.addEventListener('click', evt => evt.stopPropagation());
 
         openButton.after(button);
       }
-
-      let link = button.querySelector('a');
-      link.href = src;
     }
   }
 }
